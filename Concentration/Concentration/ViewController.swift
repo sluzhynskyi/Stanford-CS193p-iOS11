@@ -10,33 +10,46 @@ import UIKit
 class ViewController: UIViewController {
     @IBOutlet var cardButtons: [UIButton]!
     @IBOutlet weak var flipCounterLable: UILabel!
+
+    lazy var game = Concentration(numberOfPairsOfCards: (cardButtons.count + 1) / 2)
+
     var flipCount = 0 {
-        didSet{
+        didSet {
             flipCounterLable.text = "Flips: \(flipCount)"
         }
     }
-    let emojiChoices = ["🔥", "💩", "🔥", "💩"]
 
+    var emojiChoices = ["🔥", "☘️", "⭐️", "⚡️", "🧡", "👻", "✨", "🐶", "🦊", "🐼", "🦄", "🐵"].shuffled()
+    var emoji: [Int: String] = [:]
     @IBAction func touchCard(_ sender: UIButton) {
         flipCount += 1
         guard let cardNumber = cardButtons.firstIndex(of: sender) else {
             return
         }
+        game.chooseCard(at: cardNumber)
+        updateViewFromModel()
+    }
 
-        flipCard(withEmoji: emojiChoices[cardNumber], on: sender)
+    func updateViewFromModel() {
+        for index in 0..<cardButtons.count {
+            let button = cardButtons[index]
+            let card = game.cards[index]
+            if card.isFaceUp {
+                button.setTitle(emoji(for: card.identifier), for: .normal)
+                button.backgroundColor = .white
+            } else {
+                button.setTitle("", for: .normal)
+                button.backgroundColor = card.isMatched ? .clear : .systemOrange
+            }
+        }
     }
 
 
-    func flipCard(withEmoji emoji: String, on button: UIButton) {
-        if button.currentTitle! == emoji {
-            button.setTitle("", for: .normal)
-            button.backgroundColor = #colorLiteral(red: 1, green: 0.5763723254, blue: 0, alpha: 1)
+    func emoji(for cardId: Int) -> String {
+        if emoji[cardId] == nil, emojiChoices.count > 0 {
+            emoji[cardId] = emojiChoices.removeLast()
         }
-        else {
-            button.setTitle(emoji, for: .normal)
-            button.backgroundColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)
-        }
-
+        return emoji[cardId] ?? "?"
     }
 
     override func viewDidLoad() {
