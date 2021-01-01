@@ -25,11 +25,12 @@ class ViewController: UIViewController {
 
     private var emojiChoices = ["🔥", "☘️", "⭐️", "⚡️", "🧡", "👻", "✨", "🐶", "🦊", "🐼", "🦄", "🐵"].shuffled()
 
-    private var emoji: [Int: String] = [:]
+    private var emoji: [Card: String] = [:]
 
     @IBAction private func touchCard(_ sender: UIButton) {
         flipCount += 1
         guard let cardNumber = cardButtons.firstIndex(of: sender) else {
+            print("touch not existed card")
             return
         }
         game.chooseCard(at: cardNumber)
@@ -41,7 +42,7 @@ class ViewController: UIViewController {
             let button = cardButtons[index]
             let card = game.cards[index]
             if card.isFaceUp {
-                button.setTitle(emoji(for: card.identifier), for: .normal)
+                button.setTitle(emoji(for: card), for: .normal)
                 button.backgroundColor = .white
             } else {
                 button.setTitle("", for: .normal)
@@ -51,11 +52,11 @@ class ViewController: UIViewController {
     }
 
 
-    private func emoji(for cardId: Int) -> String {
-        if emoji[cardId] == nil, emojiChoices.count > 0 {
-            emoji[cardId] = emojiChoices.removeLast()
+    private func emoji(for card: Card) -> String {
+        if emoji[card] == nil, emojiChoices.count > 0 {
+            emoji[card] = emojiChoices.removeLast()
         }
-        return emoji[cardId] ?? "?"
+        return emoji[card] ?? "?"
     }
 
     override func viewDidLoad() {

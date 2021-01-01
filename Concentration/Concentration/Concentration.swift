@@ -7,22 +7,12 @@
 
 import Foundation
 
-class Concentration {
+struct Concentration {
     private(set) var cards: [Card] = []
 
     private var indexOfOneAndOnlyFaceUpCard: Int? {
         get {
-            var foundIndex: Int?
-            for index in cards.indices {
-                if cards[index].isFaceUp {
-                    if foundIndex == nil {
-                        foundIndex = index
-                    } else {
-                        return nil
-                    }
-                }
-            }
-            return foundIndex
+            return cards.indices.filter { cards[$0].isFaceUp }.oneAndOnly
         }
         set {
             for index in cards.indices {
@@ -31,13 +21,13 @@ class Concentration {
         }
     }
 
-    func chooseCard(at index: Int) {
+    mutating func chooseCard(at index: Int) {
         assert(cards.indices.contains(index), "Concentration.chooseCard(at: \(index)): chosen index not in the cards")
         let card = cards[index]
         if !card.isMatched {
             if let matchIndex = indexOfOneAndOnlyFaceUpCard, matchIndex != index {
                 // Only one card is FaceUP
-                if card.identifier == cards[matchIndex].identifier {
+                if card == cards[matchIndex] {
                     cards[index].isMatched = true
                     cards[matchIndex].isMatched = true
                 }
@@ -61,3 +51,10 @@ class Concentration {
     }
 
 }
+
+extension Collection {
+    var oneAndOnly: Element? {
+        return count == 1 ? first : nil
+    }
+}
+// Just testing commit timestamp metadata changing 
